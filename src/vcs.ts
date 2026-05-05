@@ -23,12 +23,14 @@ try {
 	let vcsContent = readFileSync(vcsFile, 'utf8')
 		.replaceAll(/\n\s*<mapping directory="\$PROJECT_DIR\$\/node_modules\/@itrocks\/.*" vcs="Git" \/>/g, '')
 	modules.forEach(module => {
-		if (!vcsContent.includes(`/@itrocks/${module}"`)) {
-			vcsContent = vcsContent.replace(
-				'</component>',
-				`  <mapping directory="$PROJECT_DIR$/node_modules/@itrocks/${module}" vcs="Git" />\n  </component>`
-			)
-		}
+		if (vcsContent.includes(`/@itrocks/${module}"`)) return
+		const component = vcsContent.indexOf('name="VcsDirectoryMappings"')
+		if (component < 0) throw new Error('vcs.xml should contain name="VcsDirectoryMappings"')
+		const position = vcsContent.indexOf('</component>', component)
+		if (position < 0) throw new Error('vcs.xml should contain </component> after name="VcsDirectoryMappings"')
+		vcsContent = vcsContent.slice(0, position)
+			+ `  <mapping directory="$PROJECT_DIR$/node_modules/@itrocks/${module}" vcs="Git" />\n  `
+			+ vcsContent.slice(position)
 	})
 	writeFileSync(vcsFile, vcsContent, 'utf8')
 }
