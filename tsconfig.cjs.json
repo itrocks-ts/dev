@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
-		"module": "CommonJS",
-		"outDir": "./cjs"
+		"module": "nodenext",
+		"outDir": "cjs"
 	},
 	"extends": "./tsconfig.json"
 }

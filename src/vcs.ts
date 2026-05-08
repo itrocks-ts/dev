@@ -1,8 +1,13 @@
 #!/usr/bin/env node
-import { appDir } from '@itrocks/app-dir'
-import { accessSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs'
-import { basename, join } from 'path'
-import { execSync } from 'child_process'
+import { appDir }        from '@itrocks/app-dir'
+import { execSync      } from 'node:child_process'
+import { accessSync }    from 'node:fs'
+import { readdirSync }   from 'node:fs'
+import { readFileSync }  from 'node:fs'
+import { rmSync }        from 'node:fs'
+import { writeFileSync } from 'node:fs'
+import { basename }      from 'node:path'
+import { join }          from 'node:path'
 
 const itrocksPath = appDir + '/node_modules/@itrocks'
 const modules     = readdirSync(itrocksPath).filter(dir => !['.', '..'].includes(dir))

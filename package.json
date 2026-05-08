@@ -5,7 +5,7 @@
 	},
 	"bin": {
 		"check-majors": "./cjs/check-majors.js",
-		"it-publish": "./cjs/publish.ts",
+		"it-publish": "./cjs/publish.js",
 		"vcs-modules": "./cjs/vcs.js",
 		"wsbuild": "./cjs/build.js"
 	},
@@ -19,10 +19,10 @@
 		"@types/node": "^24.10",
 		"@types/semver": "^7.7",
 		"chokidar": "^5.0",
-		"typescript": "~5.9"
+		"typescript": "^6.0"
 	},
 	"engines": {
-		"node": ">=18"
+		"node": ">=24"
 	},
 	"exports": {
 		"import": "./esm/webstorm.js",
@@ -31,9 +31,8 @@
 	"files": [
 		"LICENSE",
 		"README.md",
-		"*/*.d.ts",
-		"*/*.js",
-		"!*/esm.*"
+		"**/*.d.ts",
+		"**/*.js"
 	],
 	"homepage": "https://it.rocks",
 	"keywords": [
@@ -61,6 +60,5 @@
 		"build:cjs": "tsc -p tsconfig.cjs.json && chmod ugo+x cjs/build.js cjs/check-majors.js cjs/publish.js cjs/vcs.js",
 		"build:esm": "tsc -p tsconfig.esm.json && chmod ugo+x esm/build.js esm/check-majors.js esm/publish.js esm/vcs.js "
 	},
-	"types": "./esm/webstorm.d.ts",
-	"version": "0.3.4"
+	"version": "0.3.5"
 }

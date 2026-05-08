@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-import { exec }       from 'child_process'
 import { watch }      from 'chokidar'
-import { existsSync } from 'fs'
-import { basename }   from 'path'
-import { dirname }    from 'path'
-import { join }       from 'path'
-import { resolve }    from 'path'
+import { exec }       from 'node:child_process'
+import { existsSync } from 'node:fs'
+import { basename }   from 'node:path'
+import { dirname }    from 'node:path'
+import { join }       from 'node:path'
+import { resolve }    from 'node:path'
 
 const baseDir = resolve('node_modules/@itrocks')
 
