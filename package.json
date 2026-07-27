@@ -5,6 +5,7 @@
 	},
 	"bin": {
 		"check-majors": "./cjs/check-majors.js",
+		"dependency-levels": "./cjs/dependency/levels.js",
 		"it-publish": "./cjs/publish.js",
 		"vcs-modules": "./cjs/vcs.js",
 		"wsbuild": "./cjs/build.js"
