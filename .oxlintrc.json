@@ -42,6 +42,7 @@
 		"itrocks/line-length": "error",
 		"itrocks/member-order": "error",
 		"itrocks/module-order": "error",
+		"itrocks/module-start": "error",
 		"itrocks/postfix-spacing": "error",
 		"itrocks/quotes": "error",
 		"itrocks/semicolons": "error",

@@ -218,6 +218,13 @@ function lineLocation(line, start, end) {
         start: { column: start, line }
     };
 }
+function moduleContentStart(source) {
+    let offset = source.charCodeAt(0) === 0xFEFF ? 1 : 0;
+    const hashbang = source.slice(offset).match(/^#![^\r\n]*(?:\r\n|\r|\n)/)?.[0];
+    if (hashbang)
+        offset += hashbang.length;
+    return offset;
+}
 function multilineTokenLines(sourceCode, node) {
     const lines = new Set();
     for (const token of sourceCode.getTokens(node, { includeComments: true })) {
@@ -488,6 +495,27 @@ const moduleOrderRule = rule('Keep imports first and sort them by module then sy
         }
     }
 }));
+const moduleStartRule = rule('Start TypeScript modules with a blank line unless imports come first.', context => ({
+    Program(node) {
+        if (!/\.(?:cts|mts|ts|tsx)$/.test(context.filename))
+            return;
+        if (!Array.isArray(node.body) || !node.body.length)
+            return;
+        const firstStatement = node.body[0];
+        const source = context.sourceCode.text;
+        const content = source.slice(moduleContentStart(source));
+        const startsWithBreak = /^(?:\r\n|\r|\n)/.test(content);
+        const startsWithImport = firstStatement.type === 'ImportDeclaration';
+        if (startsWithBreak !== startsWithImport)
+            return;
+        context.report({
+            message: startsWithImport
+                ? 'Do not put a blank line before initial import declarations.'
+                : 'Start a TypeScript module without initial imports with a blank line.',
+            node: firstStatement
+        });
+    }
+}));
 const postfixSpacingRule = rule('Put one space before postfix increment and decrement operators.', context => ({
     UpdateExpression(node) {
         const update = node;
@@ -581,6 +609,7 @@ export default {
         'line-length': lineLengthRule,
         'member-order': memberOrderRule,
         'module-order': moduleOrderRule,
+        'module-start': moduleStartRule,
         'postfix-spacing': postfixSpacingRule,
         quotes: quotesRule,
         semicolons: semicolonsRule

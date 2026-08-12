@@ -58,6 +58,8 @@ next line before splitting the parameters.
 
 ## Modules and declarations
 
+- Start each TypeScript module with a blank line, except when import declarations come first;
+  in that case, do not put a blank line before them.
 - Prefer one named symbol per import declaration; group only a small, inseparable set.
 - Keep imports first; sort side-effect-free imports by module then imported symbol, and align `from`.
 - Prefer named exports; use a default export only when an external API requires it.
