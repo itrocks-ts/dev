@@ -63,5 +63,5 @@
 		"build:oxlint": "tsc src/oxlint/plugin.mts --ignoreConfig --target esnext --module esnext --outDir src/oxlint --skipLibCheck",
 		"lint": "npm run build:oxlint && oxlint"
 	},
-	"version": "0.5.1"
+	"version": "0.6.0"
 }
