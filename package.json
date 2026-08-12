@@ -20,17 +20,20 @@
 		"@types/node": "^24.10",
 		"@types/semver": "^7.8",
 		"chokidar": "^5.0",
+		"oxlint": "^1.78",
 		"typescript": "^7.0"
 	},
 	"engines": {
 		"node": ">=24"
 	},
 	"files": [
-		"AGENTS-@itrocks.md",
+		".oxlintrc.json",
+		"AGENTS.@itrocks.md",
 		"LICENSE",
 		"README.md",
 		"cjs",
 		"docs",
+		"src/oxlint",
 		"!*.map"
 	],
 	"homepage": "https://it.rocks",
@@ -56,7 +59,9 @@
 		"url": "git+https://github.com/itrocks-ts/dev.git"
 	},
 	"scripts": {
-		"build": "tsc && node cjs/copy-agents.js"
+		"build": "npm run build:oxlint && tsc && node cjs/copy-agents.js",
+		"build:oxlint": "tsc src/oxlint/plugin.mts --ignoreConfig --target esnext --module esnext --outDir src/oxlint --skipLibCheck",
+		"lint": "npm run build:oxlint && oxlint"
 	},
-	"version": "0.5.0"
+	"version": "0.5.1"
 }

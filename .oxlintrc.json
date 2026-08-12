@@ -1,0 +1,60 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"categories": {
+		"correctness": "error"
+	},
+	"env": {
+		"node": true
+	},
+	"ignorePatterns": [
+		"cjs/**",
+		"esm/**",
+		"src/oxlint/plugin.mjs"
+	],
+	"jsPlugins": ["./src/oxlint/plugin.mjs"],
+	"overrides": [
+		{
+			"files": ["src/oxlint/plugin.mts"],
+			"rules": {
+				"import/no-default-export": "off"
+			}
+		}
+	],
+	"plugins": [
+		"import",
+		"oxc",
+		"typescript",
+		"unicorn"
+	],
+	"rules": {
+		"arrow-body-style": ["error", "as-needed"],
+		"curly": ["error", "multi-line"],
+		"eqeqeq": ["error", "always"],
+		"import/no-default-export": "error",
+		"import/no-duplicates": "off",
+		"import/no-mutable-exports": "error",
+		"itrocks/alignment": "error",
+		"itrocks/brace-style": "error",
+		"itrocks/class-padding": "error",
+		"itrocks/declaration-order": "error",
+		"itrocks/function-signature": "error",
+		"itrocks/indentation": "error",
+		"itrocks/line-length": "error",
+		"itrocks/member-order": "error",
+		"itrocks/module-order": "error",
+		"itrocks/postfix-spacing": "error",
+		"itrocks/quotes": "error",
+		"itrocks/semicolons": "error",
+		"no-var": "error",
+		"object-shorthand": ["error", "always"],
+		"prefer-const": ["error", { "destructuring": "all" }],
+		"sort-imports": [
+			"error",
+			{
+				"allowSeparatedGroups": true,
+				"ignoreDeclarationSort": true,
+				"ignoreMemberSort": false
+			}
+		]
+	}
+}
