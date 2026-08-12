@@ -15,7 +15,7 @@
 		"npm-check-updates": "^19.1",
 		"semver": "^7.8"
 	},
-	"description": "Facilitates developments on the it.rocks framework's source code",
+	"description": "Facilitates developments on the it.rocks framework's source code within a single project",
 	"devDependencies": {
 		"@types/node": "^24.10",
 		"@types/semver": "^7.8",
@@ -55,5 +55,5 @@
 	"scripts": {
 		"build": "tsc"
 	},
-	"version": "0.4.0"
+	"version": "0.4.1"
 }

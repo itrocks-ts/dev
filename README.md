@@ -1,12 +1,12 @@
-[![npm version](https://img.shields.io/npm/v/@itrocks/webstorm?logo=npm)](https://www.npmjs.org/package/@itrocks/webstorm)
-[![npm downloads](https://img.shields.io/npm/dm/@itrocks/webstorm)](https://www.npmjs.org/package/@itrocks/webstorm)
-[![GitHub](https://img.shields.io/github/last-commit/itrocks-ts/webstorm?color=2dba4e&label=commit&logo=github)](https://github.com/itrocks-ts/webstorm)
-[![issues](https://img.shields.io/github/issues/itrocks-ts/webstorm)](https://github.com/itrocks-ts/webstorm/issues)
+[![npm version](https://img.shields.io/npm/v/@itrocks/dev?logo=npm)](https://www.npmjs.org/package/@itrocks/dev)
+[![npm downloads](https://img.shields.io/npm/dm/@itrocks/dev)](https://www.npmjs.org/package/@itrocks/dev)
+[![GitHub](https://img.shields.io/github/last-commit/itrocks-ts/dev?color=2dba4e&label=commit&logo=github)](https://github.com/itrocks-ts/dev)
+[![issues](https://img.shields.io/github/issues/itrocks-ts/dev)](https://github.com/itrocks-ts/dev/issues)
 [![discord](https://img.shields.io/discord/1314141024020467782?color=7289da&label=discord&logo=discord&logoColor=white)](https://25.re/ditr)
 
-# webstorm
+# dev
 
-Facilitates development on the it.rocks framework within a single WebStorm project.
+Facilitates developments on the it.rocks framework's source code within a single project.
 
 These CLI tools allow you to work on @itrocks/* modules from sources inside a single app,
 with Git checkout + local builds and a watcher that rebuilds dependencies as you edit.
@@ -19,7 +19,7 @@ with Git checkout + local builds and a watcher that rebuilds dependencies as you
 ## Installation
 
 ```bash
-npm i --save-dev @itrocks/webstorm
+npm i --save-dev @itrocks/dev
 ```
 
 Run via `npx`, or declare project scripts.
@@ -164,4 +164,4 @@ npm run itrocks:watch
 | No build script for a module     | Add `"build": "tsc"` (or similar) in its package.json.        |
 | Changes don’t reflect in the app | Ensure `wsbuild` is running and outputs are used by your app. |
 | Watcher does nothing             | Edit files inside `node_modules/@itrocks/<module>/src`.       |
-| Command not found                | Run `npm rebuild @itrocks/webstorm` to restore links.         |
+| Command not found                | Run `npm rebuild @itrocks/dev` to restore links.              |
