@@ -133,6 +133,23 @@ Watches all `@itrocks/*` modules for file changes and rebuild them automatically
 - The build status is displayed in the console.
 - Debounces rapid edits to avoid overlapping builds.
 
+## Shared agent instructions
+
+The package stores the common instructions for AI coding agents in
+`AGENTS-@itrocks.md`. Running the package build:
+
+```bash
+npm run build
+```
+
+compiles the TypeScript sources, then copies `AGENTS-@itrocks.md` to
+`../AGENTS.md`. From an installed package, this places the generated file at
+`node_modules/@itrocks/AGENTS.md`, where its instructions apply to the
+`@itrocks` package tree.
+
+Edit `AGENTS-@itrocks.md`, not the generated file. The shared instructions
+reference the task-specific guidelines published in the `docs` directory.
+
 ## Recommended setup
 
 Add those commands to your `package.json` scripts for convenience:

@@ -26,13 +26,16 @@
 		"node": ">=24"
 	},
 	"files": [
+		"AGENTS-@itrocks.md",
 		"LICENSE",
 		"README.md",
 		"cjs",
+		"docs",
 		"!*.map"
 	],
 	"homepage": "https://it.rocks",
 	"keywords": [
+		"backend",
 		"build",
 		"cli",
 		"dev",
@@ -53,7 +56,7 @@
 		"url": "git+https://github.com/itrocks-ts/dev.git"
 	},
 	"scripts": {
-		"build": "tsc"
+		"build": "tsc && node cjs/copy-agents.js"
 	},
-	"version": "0.4.1"
+	"version": "0.5.0"
 }
