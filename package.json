@@ -13,27 +13,23 @@
 	"dependencies": {
 		"@itrocks/app-dir": "latest",
 		"npm-check-updates": "^19.1",
-		"semver": "^7.7"
+		"semver": "^7.8"
 	},
-	"description": "Facilitates developments on the it.rocks framework's source code within a single WebStorm project",
+	"description": "Facilitates developments on the it.rocks framework's source code",
 	"devDependencies": {
 		"@types/node": "^24.10",
-		"@types/semver": "^7.7",
+		"@types/semver": "^7.8",
 		"chokidar": "^5.0",
-		"typescript": "^6.0"
+		"typescript": "^7.0"
 	},
 	"engines": {
 		"node": ">=24"
 	},
-	"exports": {
-		"import": "./esm/webstorm.js",
-		"require": "./cjs/webstorm.js"
-	},
 	"files": [
 		"LICENSE",
 		"README.md",
-		"**/*.d.ts",
-		"**/*.js"
+		"cjs",
+		"!*.map"
 	],
 	"homepage": "https://it.rocks",
 	"keywords": [
@@ -51,15 +47,13 @@
 		"webstorm"
 	],
 	"license": "ISC",
-	"name": "@itrocks/webstorm",
+	"name": "@itrocks/dev",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/itrocks-ts/webstorm.git"
+		"url": "git+https://github.com/itrocks-ts/dev.git"
 	},
 	"scripts": {
-		"build": "npm run build:cjs && npm run build:esm",
-		"build:cjs": "tsc -p tsconfig.cjs.json && chmod ugo+x cjs/build.js cjs/check-majors.js cjs/publish.js cjs/vcs.js",
-		"build:esm": "tsc -p tsconfig.esm.json && chmod ugo+x esm/build.js esm/check-majors.js esm/publish.js esm/vcs.js "
+		"build": "tsc"
 	},
-	"version": "0.3.5"
+	"version": "0.4.0"
 }

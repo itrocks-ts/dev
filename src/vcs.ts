@@ -40,7 +40,7 @@ try {
 	writeFileSync(vcsFile, vcsContent, 'utf8')
 }
 catch {
-	console.error('No such file or directory .idea/vcl.xml: ignored.')
+	console.warn('[WebStorm] No such file or directory .idea/vcl.xml: ignored.')
 }
 
 const build = new Set<string>(modules)
@@ -61,7 +61,7 @@ while (build.size) {
 				execSync(`npm run build`, {cwd: path, stdio: 'inherit'})
 			}
 			else {
-				console.log('No build script for', module)
+				console.info('No build script for', module)
 			}
 			build.delete(module)
 		}
