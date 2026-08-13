@@ -1,33 +1,31 @@
 # Package README guidelines
 
-Package README files are user documentation. They must let a developer quickly
-understand what a package does, decide whether it fits their need, install it,
-and use its public surface correctly.
+Follow the general [documentation guidelines](documentation-guidelines.md) for every Markdown file covered by this
+guide, including `README.md` and `docs/dependencies.md`.
 
-Write documentation in English and describe the package as it exists now.
-Prefer a short, accurate README to a long document padded with generic content.
+Package README files are user documentation. They must let a developer quickly understand what a package does, decide
+whether it fits their need, install it, and use its public surface correctly.
+
+Write documentation in English and describe the package as it exists now. Prefer a short, accurate README to a long
+document padded with generic content.
 
 ## Documentation scope
 
-Keep the package `README.md` focused on developer-user documentation: runtime
-requirements, installation, concepts needed to use the package, observable
-behaviour, and its directly usable API.
+Keep the package `README.md` focused on developer-user documentation: runtime requirements, installation, concepts
+needed to use the package, observable behaviour, and its directly usable API.
 
-Do not document dependency-composition hooks, `DependsOn` wiring functions,
-framework adapters, or the procedure used to connect an independent package to
-the it.rocks framework in detail in the package `README.md`. Document these
-integration contracts in `docs/dependencies.md` and link to that file from the
-`README.md` instead of mixing framework composition into the main user guide.
+Do not document dependency-composition hooks, `DependsOn` wiring functions, framework adapters, or the procedure used to
+connect an independent package to the it.rocks framework in detail in the package `README.md`. Document these
+integration contracts in `docs/dependencies.md` and link to that file from the `README.md` instead of mixing framework
+composition into the main user guide.
 
-This is an explicit exception to documenting every public export: an exported
-symbol used only to wire package dependencies or framework integration does not
-belong in the `README.md` API section.
+This is an explicit exception to documenting every public export: an exported symbol used only to wire package
+dependencies or framework integration does not belong in the `README.md` API section.
 
 ### Dependency documentation
 
-When a package exposes dependencies to be supplied by its consumer, add a
-`docs/dependencies.md` file and reference it from the package `README.md`, for
-example from a short `Dependencies` section:
+When a package exposes dependencies to be supplied by its consumer, add a `docs/dependencies.md` file and reference it
+from the package `README.md`, for example from a short `Dependencies` section:
 
 ```markdown
 ## Dependencies
@@ -39,21 +37,17 @@ integration examples.
 The separate document must cover:
 
 - the default configuration and behaviour for every dependency;
-- a generic, framework-agnostic configuration structure showing how to supply
-  the dependencies;
+- a generic, framework-agnostic configuration structure showing how to supply the dependencies;
 - the configuration supplied by the it.rocks framework.
 
-Use [`bind()` from `@itrocks/framework/src/dependencies.ts`](https://github.com/itrocks-ts/framework/blob/main/src/dependencies.ts#L105)
-as the source of truth for the it.rocks configuration. The framework bootstrap
-in `src/framework.ts` only calls this function; do not describe it as the file
-that defines the bindings. Check the current framework source when writing or
-updating the document so that the listed bindings do not become stale.
+Use [`bind()` from `@itrocks/framework/src/dependencies.ts`][framework-dependencies] as the source of truth for the
+it.rocks configuration. The framework bootstrap in `src/framework.ts` only calls this function; do not describe it as
+the file that defines the bindings. Check the current framework source when writing or updating the document so that the
+listed bindings do not become stale.
 
-Describe the it.rocks configuration as a mapping: for each dependency, state
-which function or value from which package is supplied. Do not reproduce the
-framework implementation. Link every supplied function or value directly to
-its heading in that package's documentation, using the repository URL followed
-by the heading fragment. For example:
+Describe the it.rocks configuration as a mapping: for each dependency, state which function or value from which package
+is supplied. Do not reproduce the framework implementation. Link every supplied function or value directly to its
+heading in that package's documentation, using the repository URL followed by the heading fragment. For example:
 
 ```markdown
 - `displayOf` is supplied by
@@ -62,8 +56,7 @@ by the heading fragment. For example:
 
 ## Standard opening
 
-Start every README with these five badges, replacing `<package>` with the
-unscoped package name:
+Start every README with these five badges, replacing `<package>` with the unscoped package name:
 
 ```markdown
 [![npm version](https://img.shields.io/npm/v/@itrocks/<package>?logo=npm)](https://www.npmjs.org/package/@itrocks/<package>)
@@ -77,37 +70,32 @@ unscoped package name:
 <package.json.description>.
 ```
 
-Use the unscoped package name as the single level-one heading. Immediately
-follow it with the canonical package description from `package.json`. The
-wording must be identical; only append the full stop that turns the description
-into a sentence in the README. Do not add Markdown formatting inside this first
-sentence because it would make the two descriptions diverge.
+Use the unscoped package name as the single level-one heading. Immediately follow it with the canonical package
+description from `package.json`. The wording must be identical; only append the full stop that turns the description
+into a sentence in the README. Do not add Markdown formatting inside this first sentence because it would make the two
+descriptions diverge.
 
-Start the description with the capability, not with project history or a
-generic phrase such as “A useful library”. Good descriptions use direct
-formulations such as “Transforms…”, “Provides…”, “Downloads…”, or “Marks…”.
+Start the description with the capability, not with project history or a generic phrase such as “A useful library”. Good
+descriptions use direct formulations such as “Transforms…”, “Provides…”, “Downloads…”, or “Marks…”.
 
-When a boundary is essential to choosing the package, state it here too. For
-example, say that a domain model does not perform transport, or that a bundle
-does not expose a runtime API. Put this additional information in a second
-sentence or paragraph so the canonical first sentence stays unchanged.
+When a boundary is essential to choosing the package, state it here too. For example, say that a domain model does not
+perform transport, or that a bundle does not expose a runtime API. Put this additional information in a second sentence
+or paragraph so the canonical first sentence stays unchanged.
 
 ## Package metadata
 
-Writing or revising a README also requires reviewing the `description` and
-`keywords` fields in `package.json`. Treat these files as one documentation
-change: do not leave package metadata inconsistent with the README.
+Writing or revising a README also requires reviewing the `description` and `keywords` fields in `package.json`. Treat
+these files as one documentation change: do not leave package metadata inconsistent with the README.
 
 ### Description
 
 Write one canonical description, then use it in both places:
 
-- `package.json.description` contains the description without a trailing full
-  stop;
-- the first sentence after the README title reproduces that value
-  character-for-character and adds only the trailing full stop;
-- any qualification, boundary, or second capability follows in a separate
-  sentence and is not part of `package.json.description`.
+- `package.json.description` contains the description without a trailing full stop;
+- the first sentence after the README title reproduces that value character-for-character and adds only the trailing
+  full stop;
+- any qualification, boundary, or second capability follows in a separate sentence and is not part of
+  `package.json.description`.
 
 For example:
 
@@ -123,59 +111,48 @@ For example:
 Transforms model objects to and from storage systems.
 ```
 
-To generate the description, inspect the package's public exports, source, and
-existing tests before writing it. Express the primary user-visible capability
-in one concise phrase. The description must:
+To generate the description, inspect the package's public exports, source, and existing tests before writing it. Express
+the primary user-visible capability in one concise phrase. The description must:
 
 - stand on its own in npm and search results;
-- identify the concrete subject or result, such as model objects, file inputs,
-  decorators, routes, or SQL queries;
-- mention a defining environment or constraint only when it distinguishes the
-  package, such as Node.js, MySQL, HTML, or runtime reflection;
-- use present tense for a library capability (`Transforms`, `Provides`,
-  `Marks`) and an imperative form only for a command whose purpose is naturally
-  expressed that way (`Prepare`);
-- avoid the package name, `@itrocks`, version claims, “new”, “simple”, “useful”,
-  and other non-informative or temporary marketing language;
+- identify the concrete subject or result, such as model objects, file inputs, decorators, routes, or SQL queries;
+- mention a defining environment or constraint only when it distinguishes the package, such as Node.js, MySQL, HTML, or
+  runtime reflection;
+- use present tense for a library capability (`Transforms`, `Provides`, `Marks`) and an imperative form only for a
+  command whose purpose is naturally expressed that way (`Prepare`);
+- avoid the package name, `@itrocks`, version claims, “new”, “simple”, “useful”, and other non-informative or temporary
+  marketing language;
 - avoid listing secondary features that belong later in the README.
 
-When changing an existing description, search for the previous wording in both
-files and update both occurrences in the same change. Never paraphrase the
-description when copying it into the README.
+When changing an existing description, search for the previous wording in both files and update both occurrences in the
+same change. Never paraphrase the description when copying it into the README.
 
 ### Keywords
 
-Set `package.json.keywords` to a JSON array of unique search terms that describe
-what the package actually provides. Derive them from the implementation and the
-finished README, not from the package name alone.
+Set `package.json.keywords` to a JSON array of unique search terms that describe what the package actually provides.
+Derive them from the implementation and the finished README, not from the package name alone.
 
 Select keywords from the applicable categories:
 
 - the core domain and concepts: `storage`, `entity`, `decorator`, `reflection`;
-- the main operations or results: `transform`, `validation`, `routing`,
-  `download`;
+- the main operations or results: `transform`, `validation`, `routing`, `download`;
 - the runtime or platform: `backend`, `front-end`, `browser`, `node`, `cli`;
-- relevant technologies or standards: `typescript`, `html`, `sql`, `mysql`,
-  `i18n`;
+- relevant technologies or standards: `typescript`, `html`, `sql`, `mysql`, `i18n`;
 - established architectural terms: `AOP`, `CRUD`, `ORM`, `SPA`;
 - the ecosystem keyword `it.rocks` for packages tied to the it.rocks framework.
 
-Use about 7 to 15 keywords for a focused package. A broad dependency bundle may
-need more because its constituent capabilities are themselves useful search
-terms; a narrow package may need fewer. Quality and relevance take precedence
+Use about 7 to 15 keywords for a focused package. A broad dependency bundle may need more because its constituent
+capabilities are themselves useful search terms; a narrow package may need fewer. Quality and relevance take precedence
 over reaching a target count.
 
-Use lowercase except for established case-sensitive names and acronyms. Use the
-normal spelling developers search for, including a hyphen or space for a
-recognized compound term where appropriate. Include singular and plural forms
-only when both are independently useful search terms. Sort the final array
-alphabetically, case-insensitively.
+Use lowercase except for established case-sensitive names and acronyms. Use the normal spelling developers search for,
+including a hyphen or space for a recognized compound term where appropriate. Include singular and plural forms only
+when both are independently useful search terms. Sort the final array alphabetically, case-insensitively.
 
 Do not include:
 
 - duplicates;
-- vague terms such as `library`, `tool`, `code`, `easy`, or `fast` without a
-  concrete search meaning;
+- vague terms such as `library`, `tool`, `code`, `easy`, or `fast` without a concrete search meaning;
 - unrelated technologies merely used internally to implement the package;
 - names of every dependency;
 - capabilities that are planned but not implemented;
@@ -203,14 +180,12 @@ Example:
 }
 ```
 
-After editing, parse `package.json` to validate its JSON syntax and check that
-the keywords are unique and sorted. Revisit both fields whenever the package's
-main responsibility changes.
+After editing, parse `package.json` to validate its JSON syntax and check that the keywords are unique and sorted.
+Revisit both fields whenever the package's main responsibility changes.
 
 ## Recommended structure
 
-After the opening, choose only the sections the package needs. This is the
-usual reading order:
+After the opening, choose only the sections the package needs. This is the usual reading order:
 
 1. `Requirements` for runtime, platform, compiler, or project prerequisites.
 2. `Installation` with the exact npm command.
@@ -218,17 +193,14 @@ usual reading order:
 4. `Usage` or `Basic usage` with the smallest useful working example.
 5. Feature, component, command, or behaviour sections.
 6. `API` for the public programmatic interface.
-7. Operational sections such as `Limitations`, `Common mistakes`, `Browser support`,
-   or `Troubleshooting`.
+7. Operational sections such as `Limitations`, `Common mistakes`, `Browser support`, or `Troubleshooting`.
 
-Do not add an empty section merely to match this order. A package that only
-provides types, decorators, or metadata may need only a description and
-installation instructions. Conversely, a package with non-obvious lifecycle or
-configuration rules should explain those rules before its API reference.
+Do not add an empty section merely to match this order. A package that only provides types, decorators, or metadata may
+need only a description and installation instructions. Conversely, a package with non-obvious lifecycle or configuration
+rules should explain those rules before its API reference.
 
-Use sentence case for headings. Keep heading levels hierarchical: package name
-at level one, main sections at level two, and individual API entries or examples
-at level three. Do not add a table of contents unless the document becomes hard
+Use sentence case for headings. Keep heading levels hierarchical: package name at level one, main sections at level two,
+and individual API entries or examples at level three. Do not add a table of contents unless the document becomes hard
 to navigate without one.
 
 ## Requirements and installation
@@ -247,38 +219,33 @@ Show the normal installation command as an executable shell block:
 npm i @itrocks/<package>
 ```
 
-Use `--save-dev` for development-only tools. If the package exposes a command,
-show how to run it with `npx` or from an npm script. Keep setup instructions in
-execution order and make timing requirements explicit, especially for imports,
+Use `--save-dev` for development-only tools. If the package exposes a command, show how to run it with `npx` or from an
+npm script. Keep setup instructions in execution order and make timing requirements explicit, especially for imports,
 initializers, decorators, or module-loading hooks.
 
 ## Usage and examples
 
-Lead with the smallest example that demonstrates the package's primary value.
-It should be possible to copy it into a realistic project with minimal changes.
+Lead with the smallest example that demonstrates the package's primary value. It should be possible to copy it into a
+realistic project with minimal changes.
 
 - Import from the actual public package or exported subpath.
 - Include all imports needed to understand the example.
-- Use realistic domain names and values instead of `foo` and `bar` when the
-  domain helps explain the feature.
-- Show the observable result with a return value, output comment, resulting
-  object, generated route, or DOM effect.
+- Use realistic domain names and values instead of `foo` and `bar` when the domain helps explain the feature.
+- Show the observable result with a return value, output comment, resulting object, generated route, or DOM effect.
 - Use `await` when the documented API is asynchronous.
 - Add a filename above a block when several files participate in the example.
-- Prefer one complete basic example followed by focused variants over one large
-  example that demonstrates everything.
+- Prefer one complete basic example followed by focused variants over one large example that demonstrates everything.
 
-Examples should teach constraints as well as the happy path. If initialization
-must precede imports, references must be assigned explicitly, or an override
-must inherit a base type, show that in the example and explain why.
+Examples should teach constraints as well as the happy path. If initialization must precede imports, references must be
+assigned explicitly, or an override must inherit a base type, show that in the example and explain why.
 
-Use fenced code blocks with the correct language (`bash`, `ts`, `js`, `json`,
-`yaml`, or `html`). Follow the code style of the package itself.
+Use fenced code blocks with the correct language (`bash`, `ts`, `js`, `json`, `yaml`, or `html`). Follow the code style
+of the package itself.
 
 ## Explaining concepts and behaviour
 
-Add an `Overview`, `Core idea`, `Behaviour`, or feature-specific section when
-the public types alone do not explain the model.
+Add an `Overview`, `Core idea`, `Behaviour`, or feature-specific section when the public types alone do not explain the
+model.
 
 Describe:
 
@@ -289,16 +256,14 @@ Describe:
 - supported and deliberately unsupported cases;
 - integration points with other `@itrocks` packages.
 
-State behaviour precisely. Prefer “Only declared properties are assigned” or
-“Triggers the native `change` event after drop” to broad benefit statements.
-For multiple exact mappings, priorities, or configuration outcomes, use a small
+State behaviour precisely. Prefer “Only declared properties are assigned” or “Triggers the native `change` event after
+drop” to broad benefit statements. For multiple exact mappings, priorities, or configuration outcomes, use a small
 table. For a simple sequence, use an ordered list.
 
 ## Documenting the API
 
-Document public exports, not private implementation details. Group entries by
-kind when useful: constants, types, functions, decorators, classes, properties,
-and methods.
+Document public exports, not private implementation details. Group entries by kind when useful: constants, types,
+functions, decorators, classes, properties, and methods.
 
 For each non-trivial API entry:
 
@@ -330,11 +295,10 @@ Creates and registers a new thing.
 The registered `Thing` instance.
 ````
 
-For decorators, explain what they mark or store, where they may be applied, and
-how an explicit `false` or omitted argument changes inherited/default behaviour.
-For callbacks, document the callback signature and when it runs. For commands,
-replace the API signature with the exact command and cover inputs, changes made,
-output, exit behaviour, and dry-run mode where applicable.
+For decorators, explain what they mark or store, where they may be applied, and how an explicit `false` or omitted
+argument changes inherited/default behaviour. For callbacks, document the callback signature and when it runs. For
+commands, replace the API signature with the exact command and cover inputs, changes made, output, exit behaviour, and
+dry-run mode where applicable.
 
 Cross-link related entries within the README so definitions are not repeated.
 
@@ -342,71 +306,58 @@ Cross-link related entries within the README so definitions are not repeated.
 
 ### Dependency bundles
 
-List the packages pulled in and give each a one-line role. Explicitly say
-whether the bundle exports runtime code. Explain when to depend on the bundle
-instead of its individual packages, then show imports from those dedicated
-packages rather than inventing a bundle API.
+List the packages pulled in and give each a one-line role. Explicitly say whether the bundle exports runtime code.
+Explain when to depend on the bundle instead of its individual packages, then show imports from those dedicated packages
+rather than inventing a bundle API.
 
 ### Command-line tools
 
-Document requirements, the exact invocation, configuration, and effects on the
-filesystem or registry. Separate “what it does” from notes and caveats. Include
-sample output when it helps users verify success, and a troubleshooting table
-for recurring symptom/cause pairs.
+Document requirements, the exact invocation, configuration, and effects on the filesystem or registry. Separate “what it
+does” from notes and caveats. Include sample output when it helps users verify success, and a troubleshooting table for
+recurring symptom/cause pairs.
 
 ### Browser packages
 
-Show both the JavaScript import and any required stylesheet. Document automatic
-integration for dynamically inserted DOM when available, DOM events or classes
-the package adds, styling hooks, and browser/API requirements.
+Show both the JavaScript import and any required stylesheet. Document automatic integration for dynamically inserted DOM
+when available, DOM events or classes the package adds, styling hooks, and browser/API requirements.
 
 ### Framework and configuration packages
 
-Explain initialization order before the full API. Give a minimal configuration,
-then document resolution, precedence, inheritance, or fallback rules. Add a
-`Common mistakes` or `Limitations` section when misuse can appear to succeed
-while having no effect.
+Explain initialization order before the full API. Give a minimal configuration, then document resolution, precedence,
+inheritance, or fallback rules. Add a `Common mistakes` or `Limitations` section when misuse can appear to succeed while
+having no effect.
 
 ## Links and typography
 
-- Wrap package names, symbols, commands, filenames, HTML elements, attributes,
-  and literal values in backticks.
-- Link the first useful mention of another `@itrocks` package to its GitHub
-  repository, or directly to the relevant heading when referring to one of its
-  concepts.
+- Wrap package names, symbols, commands, filenames, HTML elements, attributes, and literal values in backticks.
+- Link the first useful mention of another `@itrocks` package to its GitHub repository, or directly to the relevant
+  heading when referring to one of its concepts.
 - Link platform concepts to authoritative documentation such as MDN.
 - Use relative heading links for concepts defined in the same README.
-- Use bold text sparingly for labels or an important distinction, not for whole
-  sentences.
-- Keep paragraphs focused and line lengths readable. Break long explanations at
-  logical phrase boundaries.
-- Use notes only for exceptional information; put normal behaviour in the main
-  prose.
+- Use bold text sparingly for labels or an important distinction, not for whole sentences.
+- Keep paragraphs focused and line lengths readable. Break long explanations at logical phrase boundaries.
+- Use notes only for exceptional information; put normal behaviour in the main prose.
 
 ## Accuracy and maintenance
 
 Before publishing or updating a README:
 
-- verify that the README's first sentence is exactly
-  `package.json.description` plus a full stop;
+- verify that the README's first sentence is exactly `package.json.description` plus a full stop;
 - verify that `package.json.keywords` are relevant, unique, and sorted;
 - parse `package.json` after editing it;
 - verify every import against `exports` and the generated package files;
 - compare signatures, defaults, return types, and async behaviour with source;
 - run or type-check examples when practical;
 - verify that linked packages, source files, demos, and headings exist;
-- remove obsolete exports and instructions in the same change that removes the
-  corresponding code;
+- remove obsolete exports and instructions in the same change that removes the corresponding code;
 - label incomplete features clearly instead of documenting them as available.
 
-Do not copy an API section from a related package without checking semantic
-differences. Avoid release-specific wording such as “new”, version-pinned
-installation commands, and promises about future work in the main usage path.
+Do not copy an API section from a related package without checking semantic differences. Avoid release-specific wording
+such as “new”, version-pinned installation commands, and promises about future work in the main usage path.
 
 ## Minimal template
 
-Use this as a starting point, then remove or rename optional sections to fit the
-package:
+Use this as a starting point, then remove or rename optional sections to fit the package:
 
 ````markdown
 [the five standard badges]
@@ -455,8 +406,10 @@ publicExport(argument: Type, option?: Option): Result
 <Why it fails and the correct usage.>
 ````
 
-The final README should feel proportionate to the package: immediate value at
-the top, enough detail to use the public contract safely, and no filler.
+The final README should feel proportionate to the package: immediate value at the top, enough detail to use the public
+contract safely, and no filler.
 
-The accompanying `package.json` must contain the same canonical description
-without the final full stop and a reviewed, sorted array of relevant keywords.
+The accompanying `package.json` must contain the same canonical description without the final full stop and a reviewed,
+sorted array of relevant keywords.
+
+[framework-dependencies]: https://github.com/itrocks-ts/framework/blob/main/src/dependencies.ts#L105

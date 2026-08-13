@@ -28,6 +28,14 @@ Keep the dependency contract small, typed, and expressed in domain terms. Defaul
 for isolated tests. Group related bindings behind one initializer when consumers should not need to understand the
 internal submodules.
 
+When a dependency is fulfilled by an existing framework function, keep the dependency name, parameter meaning, and
+parameter order identical to that function whenever the lower-level package has the required context. For example, a
+package that knows a target and property should depend on `componentOf(target, property)` or
+`requiredOf(target, property)`, not on a renamed predicate or a wrapper-specific argument. This lets the composition
+root use `{ componentOf, requiredOf }` directly, keeps the concepts recognizable across packages, and avoids adapter
+functions that only reshape an otherwise identical call. Introduce an adapter only when the values or semantics
+actually differ.
+
 The framework composition root performs binding before serving requests. Its observed order is: load layered
 configuration, install configured export composition, bind dependencies and transformer registries, then start
 servers. Avoid import-time reads that freeze configurable metadata before this sequence completes.
@@ -50,6 +58,7 @@ for server dependency injection. They solve different problems.
 - Put the abstraction in the lower-level package and the binding in the higher-level composition root.
 - Export one clearly named `*DependsOn`, `set*Dependencies`, or `init*` entry point.
 - Merge partial bindings without erasing defaults.
+- Reuse the name and complete call signature of an existing function when it directly fulfills a dependency.
 - Initialize registries once, before the first request or reflection-dependent operation.
 - Use configuration for deployable selection; use direct initialization for code-level collaboration.
 - Check ordering when two replacements, mixins, or registry initializers affect the same behavior.
