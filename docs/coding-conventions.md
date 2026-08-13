@@ -60,8 +60,10 @@ next line before splitting the parameters.
 
 - Start each TypeScript module with a blank line, except when import declarations come first;
   in that case, do not put a blank line before them.
-- Prefer one named symbol per import declaration; group only a small, inseparable set.
-- Keep imports first; sort side-effect-free imports by module then imported symbol, and align `from`.
+- Import one symbol per import declaration.
+- Keep imports first; sort side-effect-free imports by `from` module specifier, then by imported symbol,
+  and align `from`.
+- Omit `.js` and `.ts` extensions from module specifiers when module resolution permits it.
 - Prefer named exports; use a default export only when an external API requires it.
 - Use `const` unless reassignment is required; never use `var`.
 - Use object property and method shorthand.
