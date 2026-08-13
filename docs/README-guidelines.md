@@ -7,6 +7,59 @@ and use its public surface correctly.
 Write documentation in English and describe the package as it exists now.
 Prefer a short, accurate README to a long document padded with generic content.
 
+## Documentation scope
+
+Keep the package `README.md` focused on developer-user documentation: runtime
+requirements, installation, concepts needed to use the package, observable
+behaviour, and its directly usable API.
+
+Do not document dependency-composition hooks, `DependsOn` wiring functions,
+framework adapters, or the procedure used to connect an independent package to
+the it.rocks framework in detail in the package `README.md`. Document these
+integration contracts in `docs/dependencies.md` and link to that file from the
+`README.md` instead of mixing framework composition into the main user guide.
+
+This is an explicit exception to documenting every public export: an exported
+symbol used only to wire package dependencies or framework integration does not
+belong in the `README.md` API section.
+
+### Dependency documentation
+
+When a package exposes dependencies to be supplied by its consumer, add a
+`docs/dependencies.md` file and reference it from the package `README.md`, for
+example from a short `Dependencies` section:
+
+```markdown
+## Dependencies
+
+See [dependency configuration](docs/dependencies.md) for the defaults and
+integration examples.
+```
+
+The separate document must cover:
+
+- the default configuration and behaviour for every dependency;
+- a generic, framework-agnostic configuration structure showing how to supply
+  the dependencies;
+- the configuration supplied by the it.rocks framework.
+
+Use [`bind()` from `@itrocks/framework/src/dependencies.ts`](https://github.com/itrocks-ts/framework/blob/main/src/dependencies.ts#L105)
+as the source of truth for the it.rocks configuration. The framework bootstrap
+in `src/framework.ts` only calls this function; do not describe it as the file
+that defines the bindings. Check the current framework source when writing or
+updating the document so that the listed bindings do not become stale.
+
+Describe the it.rocks configuration as a mapping: for each dependency, state
+which function or value from which package is supplied. Do not reproduce the
+framework implementation. Link every supplied function or value directly to
+its heading in that package's documentation, using the repository URL followed
+by the heading fragment. For example:
+
+```markdown
+- `displayOf` is supplied by
+  [`displayOf` from `@itrocks/property-view`](https://github.com/itrocks-ts/property-view#displayof).
+```
+
 ## Standard opening
 
 Start every README with these five badges, replacing `<package>` with the
