@@ -78,7 +78,7 @@ Publishes local `@itrocks/*` packages whose **local version is ahead of npm**.
   - otherwise → reported as **unchanged**.
 - Runs `npm publish` (or `npm publish --access public` for packages not yet in the index) in each package directory.
 
-At the end, it prints how many `@itrocks` packages were checked.
+At the end, it prints how many `@itrocks` packages were checked and how many were published successfully.
 
 **Dry-run: `--dry`**
 
@@ -88,7 +88,9 @@ Add `--dry` to **see exactly what would be published**, without touching npm.
 npx it-publish --dry
 ```
 
-In this mode, the command only prints the intended `npm publish` calls:
+In this mode, the command only prints the intended `npm publish` calls.
+
+The final summary reports how many packages would be published.
 
 **Notes**
 

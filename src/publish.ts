@@ -75,7 +75,8 @@ async function main()
 
 	const publishedVersions = await getItrocksPublishedVersions()
 	const packageDirs       = await getPackageDirs(baseDir)
-	let   count             = 0
+	let   checkedCount      = 0
+	let   publishCount      = 0
 
 	if (!publishedVersions.size) {
 		console.log('Unabled to list published versions')
@@ -83,11 +84,12 @@ async function main()
 	}
 
 	for (const dir of packageDirs) {
-		await publishPackage(dir, publishedVersions)
-		count ++
+		if (await publishPackage(dir, publishedVersions)) publishCount ++
+		checkedCount ++
 	}
 
-	console.log(`\nChecked ${count} @itrocks package(s) in ${baseDir}`)
+	console.log(`\nChecked ${checkedCount} @itrocks package(s) in ${baseDir}`)
+	console.log(`${dryRun ? 'Would publish' : 'Published'} ${publishCount} @itrocks package(s)`)
 }
 
 async function publishPackage(dir: string, publishedVersions: Map<string, string>)
@@ -95,13 +97,13 @@ async function publishPackage(dir: string, publishedVersions: Map<string, string
 	const packageFile = join(dir, 'package.json')
 	const pkg         = await readJson(packageFile) as { name?: string, version?: string }
 
-	if (!pkg?.name || !pkg?.version) return
-	if (!pkg.name.startsWith('@itrocks/')) return
+	if (!pkg?.name || !pkg?.version) return false
+	if (!pkg.name.startsWith('@itrocks/')) return false
 
 	const localVersion = pkg.version
 	if (!valid(localVersion)) {
 		console.warn(`Skipping ${pkg.name}: invalid local version "${localVersion}"`)
-		return
+		return false
 	}
 
 	const publishedVersion = publishedVersions.get(pkg.name) ?? null
@@ -110,41 +112,40 @@ async function publishPackage(dir: string, publishedVersions: Map<string, string
 		console.log(`🚀 ${pkg.name}@${localVersion} (not yet published in search index)`)
 		if (dryRun) {
 			console.log('    dry-run: npm publish --access public')
-			return
+			return true
 		}
 		const { code, stderr } = await runNpm(['publish', '--access', 'public'], dir)
 		if (code !== 0) {
 			console.error(`    publish failed:\n${stderr}`)
+			return false
 		}
-		else {
-			console.log('    published')
-		}
-		return
+		console.log('    published')
+		return true
 	}
 
 	if (!valid(publishedVersion)) {
 		console.warn(`Skipping ${pkg.name}: invalid published version "${publishedVersion}"`)
-		return
+		return false
 	}
 
 	if (!gt(localVersion, publishedVersion)) {
 		console.log(`↩︎ ${pkg.name} unchanged (local ${localVersion}, npm ${publishedVersion})`)
-		return
+		return false
 	}
 
 	console.log(`⬆️  ${pkg.name} ${publishedVersion} → ${localVersion}`)
 	if (dryRun) {
 		console.log('    dry-run: npm publish')
-		return
+		return true
 	}
 
 	const { code, stderr } = await runNpm(['publish'], dir)
 	if (code !== 0) {
 		console.error(`    publish failed:\n${stderr}`)
+		return false
 	}
-	else {
-		console.log('    published')
-	}
+	console.log('    published')
+	return true
 }
 
 async function readJson(file: string)
