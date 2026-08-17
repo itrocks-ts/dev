@@ -59,10 +59,10 @@
 		"url": "git+https://github.com/itrocks-ts/dev.git"
 	},
 	"scripts": {
-		"build": "npm run build:oxlint && tsc && node cjs/copy-agents.js && npm run build:permissions",
-		"build:oxlint": "tsc src/oxlint/plugin.mts --ignoreConfig --target esnext --module esnext --outDir src/oxlint --skipLibCheck",
+		"build": "tsc && node cjs/copy-agents.js && npm run build:permissions",
+		"build:oxlint": "tsc --project src/oxlint/tsconfig.json",
 		"build:permissions": "node cjs/set-executable.js",
-		"lint": "npm run build:oxlint && oxlint"
+		"lint": "npm run build:oxlint && oxlint --config .oxlintrc.json ."
 	},
-	"version": "0.7.1"
+	"version": "0.8.0"
 }

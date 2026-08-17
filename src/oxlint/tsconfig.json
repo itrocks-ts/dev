@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"forceConsistentCasingInFileNames": true,
+		"module": "esnext",
+		"skipLibCheck": true,
+		"target": "esnext",
+		"types": []
+	},
+	"files": ["plugin.mts"]
+}
