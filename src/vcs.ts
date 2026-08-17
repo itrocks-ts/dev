@@ -10,7 +10,9 @@ import { basename }      from 'node:path'
 import { join }          from 'node:path'
 
 const itrocksPath = appDir + '/node_modules/@itrocks'
-const modules     = readdirSync(itrocksPath).filter(dir => !['.', '..'].includes(dir))
+const modules     = readdirSync(itrocksPath, { withFileTypes: true })
+	.filter(entry => entry.isDirectory())
+	.map(entry => entry.name)
 
 modules.forEach(module => {
 	const path = join(itrocksPath, module)
