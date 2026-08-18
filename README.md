@@ -105,8 +105,8 @@ Replaces any `@itrocks/*` package installed from npm with its **Git repository**
 
 **What it does:**
 
-- Checks the application repository and existing `@itrocks/*` Git checkouts before changing any files. It stops and
-  reports staged, unstaged, and untracked files, local stashes, and commits absent from known remote branches.
+- Checks existing `node_modules/@itrocks/*` Git checkouts before changing any files. It stops and reports staged,
+  unstaged, and untracked files, local stashes, and commits absent from known remote branches.
 - Scans `node_modules/@itrocks/*` in your app.
 - Before cloning, consolidates the modules' development dependencies into the app, using `^major.minor` constraints.
   Existing dependencies are installed only when their required major or minor version increases. The command runs

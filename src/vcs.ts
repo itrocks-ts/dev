@@ -57,49 +57,47 @@ function buildModules()
 
 function checkGitRepositories(): boolean
 {
-	const repositories = [{ name: 'application', path: appDir }]
-	modules.forEach(module => {
-		const path = join(itrocksPath, module)
-		if (existsSync(join(path, '.git'))) repositories.push({ name: `@itrocks/${module}`, path })
-	})
-
-	const problems = repositories.map(repository => {
-		const issues: string[] = []
-		let status: string
-		try {
-			status = gitOutput(repository.path, ['status', '--porcelain=v1', '--untracked-files=all'])
-		}
-		catch {
-			return { ...repository, issues: ['Git status could not be read'] }
-		}
-		status.split(/\r?\n/).filter(Boolean).forEach(line => {
-			const code = line.slice(0, 2)
-			const file = line.slice(3)
-			if (['DD', 'AU', 'UD', 'UA', 'DU', 'AA', 'UU'].includes(code)) {
-				issues.push(`conflict: ${file}`)
-				return
+	const problems = modules
+		.map(module => ({ name: `@itrocks/${module}`, path: join(itrocksPath, module) }))
+		.filter(repository => existsSync(join(repository.path, '.git')))
+		.map(repository => {
+			const issues: string[] = []
+			let status: string
+			try {
+				status = gitOutput(repository.path, ['status', '--porcelain=v1', '--untracked-files=all'])
 			}
-			if (code === '??') {
-				issues.push(`untracked: ${file}`)
-				return
+			catch {
+				return { ...repository, issues: ['Git status could not be read'] }
 			}
-			if (code[0] !== ' ') issues.push(`staged: ${file}`)
-			if (code[1] !== ' ') issues.push(`not staged: ${file}`)
-		})
-		try {
-			const commits = new Set([
-				...gitOutput(repository.path, ['rev-list', '--branches', '--not', '--remotes']).split(/\r?\n/),
-				...gitOutput(repository.path, ['rev-list', 'HEAD', '--not', '--remotes']).split(/\r?\n/)
-			].filter(Boolean))
-			if (commits.size) issues.push(`${commits.size} commit(s) not found on a known remote branch`)
-			const stashes = gitOutput(repository.path, ['stash', 'list', '--format=%gd: %s']).split(/\r?\n/).filter(Boolean)
-			stashes.forEach(stash => issues.push(`local stash: ${stash}`))
-		}
-		catch {
-			issues.push('pushed commits and local stashes could not be verified')
-		}
-		return { ...repository, issues }
-	}).filter(repository => repository.issues.length)
+			status.split(/\r?\n/).filter(Boolean).forEach(line => {
+				const code = line.slice(0, 2)
+				const file = line.slice(3)
+				if (['DD', 'AU', 'UD', 'UA', 'DU', 'AA', 'UU'].includes(code)) {
+					issues.push(`conflict: ${file}`)
+					return
+				}
+				if (code === '??') {
+					issues.push(`untracked: ${file}`)
+					return
+				}
+				if (code[0] !== ' ') issues.push(`staged: ${file}`)
+				if (code[1] !== ' ') issues.push(`not staged: ${file}`)
+			})
+			try {
+				const commits = new Set([
+					...gitOutput(repository.path, ['rev-list', '--branches', '--not', '--remotes']).split(/\r?\n/),
+					...gitOutput(repository.path, ['rev-list', 'HEAD', '--not', '--remotes']).split(/\r?\n/)
+				].filter(Boolean))
+				if (commits.size) issues.push(`${commits.size} commit(s) not found on a known remote branch`)
+				const stashes = gitOutput(repository.path, ['stash', 'list', '--format=%gd: %s'])
+					.split(/\r?\n/).filter(Boolean)
+				stashes.forEach(stash => issues.push(`local stash: ${stash}`))
+			}
+			catch {
+				issues.push('pushed commits and local stashes could not be verified')
+			}
+			return { ...repository, issues }
+		}).filter(repository => repository.issues.length)
 
 	if (!problems.length) return true
 	console.error('vcs-modules stopped: Git work must be clean and pushed before dependencies are installed.')
@@ -130,7 +128,7 @@ function gitOutput(path: string, arguments_: string[]): string
 	return execFileSync('git', ['-C', path, ...arguments_], {
 		encoding: 'utf8',
 		stdio:    ['ignore', 'pipe', 'ignore']
-	}).trim()
+	}).trimEnd()
 }
 
 function installDevDependencies()
