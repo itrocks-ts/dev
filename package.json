@@ -64,5 +64,5 @@
 		"build:permissions": "node cjs/set-executable.js",
 		"lint": "npm run build:oxlint && oxlint --config .oxlintrc.json ."
 	},
-	"version": "0.8.0"
+	"version": "0.9.0"
 }

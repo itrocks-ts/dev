@@ -106,6 +106,8 @@ Replaces any `@itrocks/*` package installed from npm with its **Git repository**
 **What it does:**
 
 - Scans `node_modules/@itrocks/*` in your app.
+- Before cloning, consolidates the modules' development dependencies into the app, using `^major.minor` constraints.
+  Existing dependencies are installed only when their required major or minor version increases.
 - Updates WebStorm configuration file `.idea/vcs.xml` that each `@itrocks/*` module appears
   as a distinct Git root and project module inside WebStorm.
 - For each module that’s not already a Git checkout,

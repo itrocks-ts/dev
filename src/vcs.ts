@@ -1,23 +1,31 @@
 #!/usr/bin/env node
-import { appDir }        from '@itrocks/app-dir'
-import { execSync      } from 'node:child_process'
-import { accessSync }    from 'node:fs'
-import { existsSync }    from 'node:fs'
-import { mkdtempSync }   from 'node:fs'
-import { readdirSync }   from 'node:fs'
-import { readFileSync }  from 'node:fs'
-import { renameSync }    from 'node:fs'
-import { rmSync }        from 'node:fs'
-import { writeFileSync } from 'node:fs'
-import { basename }      from 'node:path'
-import { join }          from 'node:path'
-import { coerce }        from 'semver'
-import { lt }            from 'semver'
+import { normalizeVersion } from './dev-dependency-version'
+import { requiresUpgrade }  from './dev-dependency-version'
+import { appDir }           from '@itrocks/app-dir'
+import { execSync }         from 'node:child_process'
+import { accessSync }       from 'node:fs'
+import { existsSync }       from 'node:fs'
+import { mkdtempSync }      from 'node:fs'
+import { readdirSync }      from 'node:fs'
+import { readFileSync }     from 'node:fs'
+import { renameSync }       from 'node:fs'
+import { rmSync }           from 'node:fs'
+import { writeFileSync }    from 'node:fs'
+import { basename }         from 'node:path'
+import { join }             from 'node:path'
+
+interface PackageJson
+{
+	devDependencies?: Record<string, string>
+}
+
+interface PackageLock
+{
+	packages?: Record<string, PackageJson>
+}
 
 const itrocksPath = appDir + '/node_modules/@itrocks'
-const modules     = readdirSync(itrocksPath, { withFileTypes: true })
-	.filter(entry => entry.isDirectory())
-	.map(entry => entry.name)
+let modules       = listModules()
 
 function buildModules()
 {
@@ -64,24 +72,42 @@ function checkoutModules()
 
 function installDevDependencies()
 {
-	const installed = JSON.parse(readFileSync(appDir + '/package.json', 'utf8')).devDependencies || {}
-	const required: Record<string, string> = {}
+	const appPackage        = appDir + '/package.json'
+	const appPackageContent = readFileSync(appPackage, 'utf8')
+	const appPackageJson    = JSON.parse(appPackageContent) as PackageJson
+
+	const installed: Record<string, string> = appPackageJson.devDependencies ||= {}
+	const required:  Record<string, string> = {}
 	modules.forEach(module => {
 		const json = JSON.parse(readFileSync(join(itrocksPath, module, 'package.json'), 'utf8'))
 		Object.entries<string>(json.devDependencies || {}).forEach(([dependency, version]) => {
-			if (requiresUpgrade(required[dependency], version)) required[dependency] = version
+			const normalized = normalizeVersion(version)
+			if (requiresUpgrade(required[dependency], normalized)) required[dependency] = normalized
 		})
 	})
 	const install = Object.entries(required)
 		.filter(([dependency, version]) => requiresUpgrade(installed[dependency], version))
-		.map(([dependency, version]) => `"${dependency}@${version}"`)
-	if (!install.length) return
+		.map(([dependency]) => dependency)
+	let packageChanged = false
+	Object.entries(required).forEach(([dependency, version]) => {
+		const selected = requiresUpgrade(installed[dependency], version)
+			? version
+			: normalizeVersion(installed[dependency] as string)
+		if (installed[dependency] === selected) return
+		installed[dependency] = selected
+		packageChanged        = true
+	})
+	if (packageChanged) writeJson(appPackage, appPackageJson, appPackageContent)
+	if (!install.length) {
+		if (packageChanged) updatePackageLock(installed)
+		return
+	}
 
 	const backup       = mkdtempSync(join(appDir, '.vcs-modules-'))
 	const repositories = modules.filter(module => existsSync(join(itrocksPath, module, '.git')))
 	repositories.forEach(module => renameSync(join(itrocksPath, module), join(backup, module)))
 	try {
-		execSync(`npm install --save-dev -- ${install.join(' ')}`, { cwd: appDir, stdio: 'inherit' })
+		execSync('npm install', { cwd: appDir, stdio: 'inherit' })
 	}
 	finally {
 		repositories.forEach(module => {
@@ -92,22 +118,39 @@ function installDevDependencies()
 	}
 }
 
+function listModules(): string[]
+{
+	return readdirSync(itrocksPath, { withFileTypes: true })
+		.filter(entry => entry.isDirectory())
+		.map(entry => entry.name)
+		.sort()
+}
+
 function main()
 {
+	installDevDependencies()
+	modules = listModules()
 	checkoutModules()
 	updateVcsMappings()
-	installDevDependencies()
 	buildModules()
 	console.log('Done.')
 }
 
-function requiresUpgrade(current: string | undefined, required: string)
+function updatePackageLock(devDependencies: Record<string, string>)
 {
-	if (!current) return true
-	if ((current === required) || (current === 'latest')) return false
-	const currentVersion  = coerce(current)
-	const requiredVersion = coerce(required)
-	return !currentVersion || !requiredVersion || lt(currentVersion, requiredVersion)
+	const packageLock = appDir + '/package-lock.json'
+	if (!existsSync(packageLock)) return
+	const packageLockContent = readFileSync(packageLock, 'utf8')
+	const packageLockJson    = JSON.parse(packageLockContent) as PackageLock
+	const packageLockRoot    = packageLockJson.packages?.['']?.devDependencies
+	if (!packageLockRoot) return
+	let changed = false
+	Object.entries(devDependencies).forEach(([dependency, version]) => {
+		if (!(dependency in packageLockRoot) || (packageLockRoot[dependency] === version)) return
+		packageLockRoot[dependency] = version
+		changed                     = true
+	})
+	if (changed) writeJson(packageLock, packageLockJson, packageLockContent)
 }
 
 function updateVcsMappings()
@@ -131,5 +174,12 @@ function updateVcsMappings()
 	catch {
 		console.warn('[WebStorm] No such file or directory .idea/vcl.xml: ignored.')
 	}
+}
+
+function writeJson(file: string, json: object, source: string)
+{
+	const endOfLine   = source.includes('\r\n') ? '\r\n' : '\n'
+	const indentation = source.match(/\n([\t ]+)"/)?.[1] ?? '\t'
+	writeFileSync(file, JSON.stringify(json, undefined, indentation).replaceAll('\n', endOfLine) + endOfLine, 'utf8')
 }
 main()
