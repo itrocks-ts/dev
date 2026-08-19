@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-import { appDir }   from '@itrocks/app-dir'
-import { execFile } from 'node:child_process'
-import { access }   from 'node:fs/promises'
-import { readdir }  from 'node:fs/promises'
-import { readFile } from 'node:fs/promises'
-import { join }     from 'node:path'
-import { gt }       from 'semver'
-import { valid }    from 'semver'
+import { appDir }               from '@itrocks/app-dir'
+import { execFile }             from 'node:child_process'
+import { access }               from 'node:fs/promises'
+import { readdir }              from 'node:fs/promises'
+import { readFile }             from 'node:fs/promises'
+import { join }                 from 'node:path'
+import { gt }                   from 'semver'
+import { valid }                from 'semver'
+import { printHelpIfRequested } from './cli-help'
 
 const baseDir = appDir + '/node_modules/@itrocks'
 const dryRun  = process.argv.slice(2).includes('--dry')
@@ -71,6 +72,16 @@ async function getPackageDirs(dir: string)
 
 async function main()
 {
+	if (printHelpIfRequested(`
+Usage: it-publish [--dry] [--help]
+
+Publish local @itrocks packages whose version is ahead of the npm registry.
+
+Options:
+  --dry       Report packages without publishing them.
+  -h, --help  Show this help without querying npm or publishing packages.
+	`)) return
+
 	console.log(`it-publish – scan @itrocks packages${dryRun ? ' (dry-run)' : ''}\n`)
 
 	const publishedVersions = await getItrocksPublishedVersions()

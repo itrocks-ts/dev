@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-import { watch }      from 'chokidar'
-import { exec }       from 'node:child_process'
-import { existsSync } from 'node:fs'
-import { basename }   from 'node:path'
-import { dirname }    from 'node:path'
-import { join }       from 'node:path'
-import { resolve }    from 'node:path'
+import { watch }                from 'chokidar'
+import { exec }                 from 'node:child_process'
+import { existsSync }           from 'node:fs'
+import { basename }             from 'node:path'
+import { dirname }              from 'node:path'
+import { join }                 from 'node:path'
+import { resolve }              from 'node:path'
+import { printHelpIfRequested } from './cli-help'
 
 const baseDir = resolve('node_modules/@itrocks')
 
@@ -66,33 +67,48 @@ function runBuild(filePath: string)
 	})
 }
 
-const watcher = watch(baseDir, {
-	ignored: /node_modules\/@itrocks\/[^/]+\/(esm|cjs|node_modules)/,
-	persistent: true,
-	ignoreInitial: true,
-	awaitWriteFinish: {
-		stabilityThreshold: 200,
-		pollInterval: 100,
-	},
-})
+function main()
+{
+	if (printHelpIfRequested(`
+Usage: wsbuild [--help]
 
-watcher.on('change', (filePath: string) => {
-	if (
-		!filePath.endsWith('.ts')
-		&& !filePath.endsWith('.scss')
-		&& !(
-			filePath.includes('/src/')
-			&& (
-				filePath.endsWith('.html')
-				|| filePath.endsWith('.jpg')
-				|| filePath.endsWith('.png')
-				|| filePath.endsWith('.svg')
+Watch @itrocks package sources and rebuild the owning package after a relevant file
+changes.
+
+Options:
+  -h, --help  Show this help without starting the watcher.
+	`)) return
+
+	const watcher = watch(baseDir, {
+		ignored: /node_modules\/@itrocks\/[^/]+\/(esm|cjs|node_modules)/,
+		persistent: true,
+		ignoreInitial: true,
+		awaitWriteFinish: {
+			stabilityThreshold: 200,
+			pollInterval: 100,
+		},
+	})
+
+	watcher.on('change', (filePath: string) => {
+		if (
+			!filePath.endsWith('.ts')
+			&& !filePath.endsWith('.scss')
+			&& !(
+				filePath.includes('/src/')
+				&& (
+					filePath.endsWith('.html')
+					|| filePath.endsWith('.jpg')
+					|| filePath.endsWith('.png')
+					|| filePath.endsWith('.svg')
+				)
 			)
-		)
-	) return
-	if (filePath.endsWith('.d.ts')) return
-	console.log('  Modified', filePath)
-	runBuild(filePath)
-})
+		) return
+		if (filePath.endsWith('.d.ts')) return
+		console.log('  Modified', filePath)
+		runBuild(filePath)
+	})
 
-console.log(`👀 Watch ${baseDir}...`)
+	console.log(`👀 Watch ${baseDir}...`)
+}
+
+main()

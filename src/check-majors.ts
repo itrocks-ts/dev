@@ -1,15 +1,16 @@
 #!/usr/bin/env node
-import { appDir }    from '@itrocks/app-dir'
-import { access }    from 'node:fs/promises'
-import { readdir }   from 'node:fs/promises'
-import { readFile }  from 'node:fs/promises'
-import { writeFile } from 'node:fs/promises'
-import { join }      from 'node:path'
-import { run }       from 'npm-check-updates'
-import { coerce }    from 'semver'
-import { diff }      from 'semver'
-import { inc }       from 'semver'
-import { valid }     from 'semver'
+import { appDir }               from '@itrocks/app-dir'
+import { access }               from 'node:fs/promises'
+import { readdir }              from 'node:fs/promises'
+import { readFile }             from 'node:fs/promises'
+import { writeFile }            from 'node:fs/promises'
+import { join }                 from 'node:path'
+import { run }                  from 'npm-check-updates'
+import { coerce }               from 'semver'
+import { diff }                 from 'semver'
+import { inc }                  from 'semver'
+import { valid }                from 'semver'
+import { printHelpIfRequested } from './cli-help'
 
 const baseDir = appDir + '/node_modules/@itrocks'
 const upgrade = process.argv.slice(2).includes('upgrade')
@@ -114,6 +115,16 @@ async function upgradePackageJson(packageFile: string, majors: Majors)
 
 async function main()
 {
+	if (printHelpIfRequested(`
+Usage: check-majors [upgrade] [--help]
+
+List available major dependency updates for the application and installed @itrocks
+packages. Pass upgrade to update package.json files without installing dependencies.
+
+Options:
+  -h, --help  Show this help without changing files or querying npm.
+	`)) return
+
 	if (upgrade) {
 		console.log('Upgrade mode: package.json files will be updated and the minor version will be incremented\n')
 	}

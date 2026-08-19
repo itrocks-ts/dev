@@ -1,17 +1,18 @@
 #!/usr/bin/env node
-import { normalizeVersion } from './dev-dependency-version'
-import { requiresUpgrade }  from './dev-dependency-version'
-import { appDir }           from '@itrocks/app-dir'
-import { execFileSync }     from 'node:child_process'
-import { execSync }         from 'node:child_process'
-import { accessSync }       from 'node:fs'
-import { existsSync }       from 'node:fs'
-import { readdirSync }      from 'node:fs'
-import { readFileSync }     from 'node:fs'
-import { rmSync }           from 'node:fs'
-import { writeFileSync }    from 'node:fs'
-import { basename }         from 'node:path'
-import { join }             from 'node:path'
+import { appDir }               from '@itrocks/app-dir'
+import { execFileSync }         from 'node:child_process'
+import { execSync }             from 'node:child_process'
+import { accessSync }           from 'node:fs'
+import { existsSync }           from 'node:fs'
+import { readdirSync }          from 'node:fs'
+import { readFileSync }         from 'node:fs'
+import { rmSync }               from 'node:fs'
+import { writeFileSync }        from 'node:fs'
+import { basename }             from 'node:path'
+import { join }                 from 'node:path'
+import { printHelpIfRequested } from './cli-help'
+import { normalizeVersion }     from './dev-dependency-version'
+import { requiresUpgrade }      from './dev-dependency-version'
 
 interface PackageJson
 {
@@ -177,6 +178,16 @@ function listModules(): string[]
 
 function main()
 {
+	if (printHelpIfRequested(`
+Usage: vcs-modules [--help]
+
+Replace installed @itrocks packages with Git checkouts, update development dependencies
+and WebStorm VCS mappings, then build the modules in dependency order.
+
+Options:
+  -h, --help  Show this help without changing files.
+	`)) return
+
 	if (!checkGitRepositories()) {
 		process.exitCode = 1
 		return

@@ -1,8 +1,8 @@
-// scripts/itrocks-dependency-levels.ts
-
-import { join }     from 'node:path'
-import { readdir }  from 'node:fs/promises'
-import { readFile } from 'node:fs/promises'
+#!/usr/bin/env node
+import { join }                 from 'node:path'
+import { readdir }              from 'node:fs/promises'
+import { readFile }             from 'node:fs/promises'
+import { printHelpIfRequested } from './cli-help'
 
 const SCOPE           = '@itrocks'
 const SCOPE_DIRECTORY = join(process.cwd(), 'node_modules', SCOPE)
@@ -522,6 +522,16 @@ function getErrorMessage(
 
 async function main(): Promise<void>
 {
+	if (printHelpIfRequested(`
+Usage: dependency-levels [--help]
+
+Print installed @itrocks packages grouped by dependency level and report missing or
+cyclic internal dependencies.
+
+Options:
+  -h, --help  Show this help without scanning installed packages.
+	`)) return
+
 	let packages: PackageMap
 
 	try

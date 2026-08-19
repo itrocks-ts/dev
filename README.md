@@ -24,6 +24,9 @@ npm i --save-dev @itrocks/dev
 
 Run via `npx`, or declare project scripts.
 
+Every command accepts `-h` or `--help`. Help exits before scanning packages, querying
+remote services, changing files, starting a watcher or publishing anything.
+
 ## Commands
 
 ### `npx check-majors [upgrade]`
