@@ -76,8 +76,9 @@ function checkGitRepositories(): boolean
 	return false
 }
 
-function checkoutModules()
+function checkoutModules(): Set<string>
 {
+	const clonedModules = new Set<string>()
 	modules.forEach(module => {
 		const path = join(itrocksPath, module)
 		try {
@@ -86,8 +87,10 @@ function checkoutModules()
 		catch {
 			rmSync(path, { force: true, recursive: true })
 			execSync(`git clone git@github.com:itrocks-ts/${module}`, { cwd: itrocksPath, stdio: 'inherit' })
+			clonedModules.add(module)
 		}
 	})
+	return clonedModules
 }
 
 function gitIssues(path: string, checkStashes = false): string[]
@@ -201,16 +204,17 @@ Options:
 
 	installDevDependencies()
 	modules = listModules()
-	checkoutModules()
+	const clonedModules = checkoutModules()
 	updateVcsMappings()
-	pullModules()
+	pullModules(clonedModules)
 	buildModules()
 	console.log('Done.')
 }
 
-function pullModules()
+function pullModules(clonedModules: Set<string>)
 {
 	modules.forEach(module => {
+		if (clonedModules.has(module)) return
 		const issues = gitIssues(join(itrocksPath, module))
 		if (issues.length) {
 			console.error(`\n@itrocks/${module}: pull skipped`)

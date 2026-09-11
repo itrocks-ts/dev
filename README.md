@@ -119,8 +119,9 @@ Replaces any `@itrocks/*` package installed from npm with its **Git repository**
   as a distinct Git root and project module inside WebStorm.
 - For each module that’s not already a Git checkout,
   removes the package folder and replaces it with the repository sources, so you can edit them.
-- Pulls each Git checkout with `git pull --ff-only` before building it. Repositories with pending changes or commits to
-  push are skipped with their Git status and a resolution request, without stopping updates for other repositories.
+- Pulls each existing Git checkout with `git pull --ff-only` before building it. Modules cloned during the current run
+  are already current and are not pulled. Repositories with pending changes or commits to push are skipped with their
+  Git status and a resolution request, without stopping updates for other repositories.
 - Runs the module’s build if a build script exists in its package.json.
 - Builds modules in dependency order so shared libraries are ready before dependent ones.
 
