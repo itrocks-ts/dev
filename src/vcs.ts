@@ -61,52 +61,18 @@ function checkGitRepositories(): boolean
 	const problems = modules
 		.map(module => ({ name: `@itrocks/${module}`, path: join(itrocksPath, module) }))
 		.filter(repository => existsSync(join(repository.path, '.git')))
-		.map(repository => {
-			const issues: string[] = []
-			let status: string
-			try {
-				status = gitOutput(repository.path, ['status', '--porcelain=v1', '--untracked-files=all'])
-			}
-			catch {
-				return { ...repository, issues: ['Git status could not be read'] }
-			}
-			status.split(/\r?\n/).filter(Boolean).forEach(line => {
-				const code = line.slice(0, 2)
-				const file = line.slice(3)
-				if (['DD', 'AU', 'UD', 'UA', 'DU', 'AA', 'UU'].includes(code)) {
-					issues.push(`conflict: ${file}`)
-					return
-				}
-				if (code === '??') {
-					issues.push(`untracked: ${file}`)
-					return
-				}
-				if (code[0] !== ' ') issues.push(`staged: ${file}`)
-				if (code[1] !== ' ') issues.push(`not staged: ${file}`)
-			})
-			try {
-				const commits = new Set([
-					...gitOutput(repository.path, ['rev-list', '--branches', '--not', '--remotes']).split(/\r?\n/),
-					...gitOutput(repository.path, ['rev-list', 'HEAD', '--not', '--remotes']).split(/\r?\n/)
-				].filter(Boolean))
-				if (commits.size) issues.push(`${commits.size} commit(s) not found on a known remote branch`)
-				const stashes = gitOutput(repository.path, ['stash', 'list', '--format=%gd: %s'])
-					.split(/\r?\n/).filter(Boolean)
-				stashes.forEach(stash => issues.push(`local stash: ${stash}`))
-			}
-			catch {
-				issues.push('pushed commits and local stashes could not be verified')
-			}
-			return { ...repository, issues }
-		}).filter(repository => repository.issues.length)
+		.map(repository => ({ ...repository, issues: gitIssues(repository.path, true) }))
+		.filter(repository => repository.issues.length)
 
 	if (!problems.length) return true
-	console.error('vcs-modules stopped: Git work must be clean and pushed before dependencies are installed.')
+	console.error('Development dependency installation skipped: Git work must be clean and pushed first.')
 	problems.forEach(repository => {
 		console.error(`\n${repository.name} (${repository.path})`)
 		repository.issues.forEach(issue => console.error(`  - ${issue}`))
 	})
-	console.error('\nResolve or commit file changes, apply or drop stashes, and push commits before trying again.')
+	console.error(
+		'\nResolve or commit file changes, apply or drop stashes, and push commits before installing dependencies.'
+	)
 	return false
 }
 
@@ -122,6 +88,47 @@ function checkoutModules()
 			execSync(`git clone git@github.com:itrocks-ts/${module}`, { cwd: itrocksPath, stdio: 'inherit' })
 		}
 	})
+}
+
+function gitIssues(path: string, checkStashes = false): string[]
+{
+	const issues: string[] = []
+	let status: string
+	try {
+		status = gitOutput(path, ['status', '--porcelain=v1', '--untracked-files=all'])
+	}
+	catch {
+		return ['Git status could not be read']
+	}
+	status.split(/\r?\n/).filter(Boolean).forEach(line => {
+		const code = line.slice(0, 2)
+		const file = line.slice(3)
+		if (['DD', 'AU', 'UD', 'UA', 'DU', 'AA', 'UU'].includes(code)) {
+			issues.push(`conflict: ${file}`)
+			return
+		}
+		if (code === '??') {
+			issues.push(`untracked: ${file}`)
+			return
+		}
+		if (code[0] !== ' ') issues.push(`staged: ${file}`)
+		if (code[1] !== ' ') issues.push(`not staged: ${file}`)
+	})
+	try {
+		const commits = new Set([
+			...gitOutput(path, ['rev-list', '--branches', '--not', '--remotes']).split(/\r?\n/),
+			...gitOutput(path, ['rev-list', 'HEAD', '--not', '--remotes']).split(/\r?\n/)
+		].filter(Boolean))
+		if (commits.size) issues.push(`${commits.size} commit(s) not found on a known remote branch`)
+		if (checkStashes) {
+			const stashes = gitOutput(path, ['stash', 'list', '--format=%gd: %s']).split(/\r?\n/).filter(Boolean)
+			stashes.forEach(stash => issues.push(`local stash: ${stash}`))
+		}
+	}
+	catch {
+		issues.push(`unpushed commits${checkStashes ? ' and local stashes' : ''} could not be verified`)
+	}
+	return issues
 }
 
 function gitOutput(path: string, arguments_: string[]): string
@@ -150,6 +157,10 @@ function installDevDependencies()
 	const install = Object.entries(required)
 		.filter(([dependency, version]) => requiresUpgrade(installed[dependency], version))
 		.map(([dependency]) => dependency)
+	if (install.length && !checkGitRepositories()) {
+		process.exitCode = 1
+		return
+	}
 	let packageChanged = false
 	Object.entries(required).forEach(([dependency, version]) => {
 		const selected = requiresUpgrade(installed[dependency], version)
@@ -182,22 +193,46 @@ function main()
 Usage: vcs-modules [--help]
 
 Replace installed @itrocks packages with Git checkouts, update development dependencies
-and WebStorm VCS mappings, then build the modules in dependency order.
+and WebStorm VCS mappings, pull safe repositories, then build the modules in dependency order.
 
 Options:
   -h, --help  Show this help without changing files.
 	`)) return
 
-	if (!checkGitRepositories()) {
-		process.exitCode = 1
-		return
-	}
 	installDevDependencies()
 	modules = listModules()
 	checkoutModules()
 	updateVcsMappings()
+	pullModules()
 	buildModules()
 	console.log('Done.')
+}
+
+function pullModules()
+{
+	modules.forEach(module => {
+		const issues = gitIssues(join(itrocksPath, module))
+		if (issues.length) {
+			console.error(`\n@itrocks/${module}: pull skipped`)
+			issues.forEach(issue => console.error(`  - ${issue}`))
+			try {
+				execFileSync('git', ['-C', join(itrocksPath, module), 'status'], { stdio: 'inherit' })
+			}
+			catch {
+				console.error('  Git status could not be displayed.')
+			}
+			console.error('Resolve the reported Git state, then run vcs-modules again.')
+			process.exitCode = 1
+			return
+		}
+		try {
+			execFileSync('git', ['-C', join(itrocksPath, module), 'pull', '--ff-only'], { stdio: 'inherit' })
+		}
+		catch {
+			console.error(`@itrocks/${module}: pull failed; continuing with the next repository.`)
+			process.exitCode = 1
+		}
+	})
 }
 
 function updatePackageLock(devDependencies: Record<string, string>)
@@ -246,4 +281,5 @@ function writeJson(file: string, json: object, source: string)
 	const indentation = source.match(/\n([\t ]+)"/)?.[1] ?? '\t'
 	writeFileSync(file, JSON.stringify(json, undefined, indentation).replaceAll('\n', endOfLine) + endOfLine, 'utf8')
 }
+
 main()
