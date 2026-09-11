@@ -56,6 +56,23 @@ the trailing comma and keep `): ReturnType` together. If an otherwise single-lin
 signature overflows only because of its return type, move `: ReturnType` to the
 next line before splitting the parameters.
 
+## Arbitrary ordering
+
+Whenever order has no compiler, framework, protocol, runtime, or semantic significance, sort every homogeneous
+sequence alphabetically by its declared identifier, key, method name, property name, or other stable name.
+
+This rule applies throughout configuration, documentation, source, and test files, including:
+
+- array and object entries;
+- class and object methods and properties;
+- class, function, interface, type, and variable declarations;
+- configuration keys and declarative lists;
+- constants, exports, imports, parameters, and test cases.
+
+Keep semantically coherent kinds in separate groups when that improves readability, then sort each arbitrary group
+alphabetically. Preserve any order required for fallbacks, handlers, initialization, lifecycle, overload resolution,
+precedence, protocols, the runtime, or side effects. Comment a non-obvious ordering constraint.
+
 ## Modules and declarations
 
 - Start each TypeScript module with a blank line, except when import declarations come first;
@@ -69,8 +86,7 @@ next line before splitting the parameters.
 - Use object property and method shorthand.
 - Use a concise arrow body for a single returned expression.
 
-When order has no semantic or compiler significance, group declarations by kind
-in this order, then sort each group alphabetically:
+Group declarations by kind in this order when that grouping has no semantic significance:
 
 1. types and interfaces;
 2. constants;
@@ -78,6 +94,4 @@ in this order, then sort each group alphabetically:
 4. functions;
 5. classes.
 
-Apply the same ordering to independent block declarations, class members, object
-properties, and exported symbols. Preserve required initialization, side-effect,
-handler, fallback, priority, and compiler order; comment a non-obvious exception.
+Apply the general arbitrary-ordering rule above within each group.
