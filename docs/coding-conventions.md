@@ -73,13 +73,37 @@ Keep semantically coherent kinds in separate groups when that improves readabili
 alphabetically. Preserve any order required for fallbacks, handlers, initialization, lifecycle, overload resolution,
 precedence, protocols, the runtime, or side effects. Comment a non-obvious ordering constraint.
 
+### Import ordering
+
+Import paths express locality, so sort side-effect-free imports from the most general source to the source closest to
+the current module. Apply this location order before alphabetical order:
+
+1. bare module specifiers, including packages and Node.js built-ins;
+2. parent-relative paths, from the farthest parent to the closest (`../../../`, then `../../`, then `../`);
+3. paths into subdirectories, from the deepest subdirectory to the closest;
+4. same-directory paths starting with `./` and containing no subdirectory.
+
+Within the same location and tree depth, sort alphabetically by module specifier. For repeated imports from the same
+module specifier, sort alphabetically by imported symbol.
+
+```ts
+import { Component } from '@itrocks/core'
+import { readFile }   from 'node:fs'
+import { ancestor }   from '../../../ancestor'
+import { foundation } from '../../foundation'
+import { parent }     from '../parent'
+import { validator }  from './features/contacts/validator'
+import { contacts }   from './features/contacts'
+import { feature }    from './features'
+import { local }      from './local'
+```
+
 ## Modules and declarations
 
 - Start each TypeScript module with a blank line, except when import declarations come first;
   in that case, do not put a blank line before them.
 - Import one symbol per import declaration.
-- Keep imports first; sort side-effect-free imports by `from` module specifier, then by imported symbol,
-  and align `from`.
+- Keep imports first; sort side-effect-free imports using the import ordering above, and align `from`.
 - Omit `.js` and `.ts` extensions from module specifiers when module resolution permits it.
 - Prefer named exports; use a default export only when an external API requires it.
 - Use `const` unless reassignment is required; never use `var`.
