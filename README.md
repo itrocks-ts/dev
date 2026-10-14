@@ -147,6 +147,12 @@ Watches all `@itrocks/*` modules for file changes and rebuild them automatically
 - The build status is displayed in the console.
 - Debounces rapid edits to avoid overlapping builds.
 
+## Dependency audit
+
+Use the [dependency audit procedure](docs/dependency-audit.md) to check cross-package imports, declarations,
+asset references, build tools and TypeScript typings across local `@itrocks/*` checkouts.
+It combines temporary scripts with targeted agent review and includes a request to copy into an agent conversation.
+
 ## Shared agent instructions
 
 The package stores the common instructions for AI coding agents in
