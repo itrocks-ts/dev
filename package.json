@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"@itrocks/app-dir": "latest",
+		"chokidar": "^5.0",
 		"npm-check-updates": "^19.1",
 		"semver": "^7.8"
 	},
@@ -19,7 +20,6 @@
 	"devDependencies": {
 		"@types/node": "^24.10",
 		"@types/semver": "^7.8",
-		"chokidar": "^5.0",
 		"oxlint": "^1.78",
 		"typescript": "^7.0"
 	},
@@ -63,5 +63,5 @@
 		"build:permissions": "node cjs/set-executable.js",
 		"lint": "npm run build:oxlint && oxlint --config .oxlintrc.json ."
 	},
-	"version": "0.9.6"
+	"version": "0.9.7"
 }
