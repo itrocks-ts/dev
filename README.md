@@ -161,8 +161,8 @@ compiles the TypeScript sources, then copies `AGENTS.@itrocks.md` to
 `node_modules/@itrocks/AGENTS.md`, where its instructions apply to the
 `@itrocks` package tree.
 
-Edit `AGENTS.@itrocks.md`, not the generated file. The shared instructions
-reference the task-specific guidelines published in the `docs` directory.
+Edit `AGENTS.@itrocks.md`, not the generated file, to change the forwarding entry.
+Shared conventions are maintained in [`@itrocks/handbook`](../handbook/AGENTS.md).
 
 ## Recommended setup
 
