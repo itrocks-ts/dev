@@ -133,19 +133,42 @@ Replaces any `@itrocks/*` package installed from npm with its **Git repository**
 
 ### `npx wsbuild`
 
-Watches all `@itrocks/*` modules for file changes and rebuild them automatically.
+Watches all `@itrocks/*` modules for file changes and rebuilds them automatically.
 
 **What it does:**
 
-- Watches all `.ts`  and `.scss` source files under `node_modules/@itrocks/**`.
-- On change: detects the modified module, runs its `npm run build` script.
+- Watches `.ts` (except `.d.ts`) and `.scss` files, plus HTML, JPG, PNG and SVG files under `src/`.
+- Handles additions, changes and deletions under `node_modules/@itrocks/**`, excluding `cjs`, `esm` and nested dependencies.
+- Detects the affected package and runs its `npm run build` script.
+- Groups rapid edits and queues another build if a source changes while its package is already building.
 
 **Notes:**
 
 - Perfect for editing multiple @itrocks/* modules at once in a single environment.
 - Your app rebuilds itself using the freshly compiled outputs.
 - The build status is displayed in the console.
-- Debounces rapid edits to avoid overlapping builds.
+- Builds for different packages may run concurrently; a package never has overlapping builds.
+
+**Application reload after each batch**
+
+After all active and queued builds finish, `wsbuild` updates the modification time of the application's existing
+`config.yaml`, including when a build fails. It preserves the file contents and waits for 200 ms of quiet before
+starting queued builds or completing a batch. Nothing is touched at watcher startup.
+
+Configure nodemon to watch this file explicitly, so both package rebuilds and configuration edits reload the server:
+
+```json
+{
+  "scripts": {
+    "itrocks:watch": "wsbuild",
+    "start:watch": "nodemon --signal SIGINT --watch . --watch config.yaml"
+  }
+}
+```
+
+Run both scripts from the application root, where `config.yaml` must already exist. A missing or unwritable
+configuration is reported without creating it or stopping the watcher. Normal application watching and nodemon's
+default exclusions remain active. Unknown arguments exit with status 1 before watching.
 
 ## Dependency audit
 

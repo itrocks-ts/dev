@@ -62,7 +62,8 @@
 		"build": "tsc && node cjs/copy-agents.js && npm run build:permissions",
 		"build:oxlint": "tsc --project src/oxlint/tsconfig.json",
 		"build:permissions": "node cjs/set-executable.js",
-		"lint": "npm run build:oxlint && oxlint --config .oxlintrc.json ."
+		"lint": "npm run build:oxlint && oxlint --config .oxlintrc.json .",
+		"test": "npm run build && node --test tests/*.test.cjs"
 	},
-	"version": "0.10.1"
+	"version": "0.11.0"
 }
